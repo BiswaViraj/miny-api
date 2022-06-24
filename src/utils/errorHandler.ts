@@ -1,9 +1,10 @@
 import { NextFunction, Request, Response } from "express";
+import logger from "../config/logger";
 
 export class HttpException extends Error {
   public status: number;
   public message: string;
-  constructor(message: string, status: number = 500) {
+  constructor(message: string, status = 500) {
     super(message);
     this.status = status;
     this.message = message;
@@ -18,6 +19,7 @@ function errorHandler(
 ) {
   const status = error.status || 500;
   const message = error.message || "Something went wrong";
+  logger.error(error);
   response.status(status).send({
     message,
     status,

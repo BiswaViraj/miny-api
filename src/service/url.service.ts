@@ -1,4 +1,5 @@
 import { FilterQuery } from "mongoose";
+import logger from "../config/logger";
 import { Url } from "../models";
 import { IUrl } from "../models/url.model";
 import { HttpException } from "../utils/errorHandler";
@@ -9,21 +10,14 @@ const retryUrlGeneration = async (): Promise<string> => {
   const isExists = await findOneUrl({
     shortURL,
   });
-  console.log({
-    isExists,
-  });
   if (isExists) return retryUrlGeneration();
   return shortURL;
 };
 
 export const findOneUrl = async (params: FilterQuery<IUrl>) => {
   try {
-    console.log({ params });
     const url = await Url.findOne({ ...params });
 
-    console.log({
-      url,
-    });
     return url;
   } catch (error) {
     throw new Error(error);
@@ -55,7 +49,7 @@ export const create = async ({
       ...(userId && { userId }),
       ...(timeout && { timeout }),
     });
-
+    logger.info(`Created: ${url}`);
     await url.save();
     return url.shortURL;
   } catch (error) {
