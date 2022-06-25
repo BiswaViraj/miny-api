@@ -1,23 +1,14 @@
-import { connect, ConnectOptions } from "mongoose";
+import { connect } from "mongoose";
 import { DB_URI } from "./constant";
+import logger from "./logger";
 
 const connectDB = async () => {
   try {
     const mongoURI = DB_URI;
-
-    console.log({
-      DB_URI,
-    });
-    // const options: ConnectOptions = {
-    //   useNewUrlParser: true,
-    //   useCreateIndex: true,
-    //   useFindAndModify: false,
-    //   useUnifiedTopology: true,
-    // };
     await connect(mongoURI);
-    console.log("DATABASE Connected...");
-  } catch (err) {
-    console.error(err.message);
+    logger.info("DATABASE Connected...");
+  } catch (error) {
+    logger.error(error);
     process.exit(1);
   }
 };

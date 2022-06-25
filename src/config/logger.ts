@@ -17,7 +17,7 @@ const logger = winston.createLogger({
     winston.format.splat(),
     winston.format.printf(
       ({ level, message, timestamp }) =>
-        `${level}-${timestamp}: \n${message}\n================\n`
+        `${level}-${timestamp}: \n${message}\n----------------\n`
     )
   ),
   transports: [

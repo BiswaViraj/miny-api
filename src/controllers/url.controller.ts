@@ -1,5 +1,4 @@
 import { NextFunction, Request, Response } from "express";
-import { Url } from "../models";
 import { create } from "../service/url.service";
 
 export const createUrl = async (

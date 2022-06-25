@@ -3,9 +3,9 @@ import logger from "../config/logger";
 import { Url } from "../models";
 import { IUrl } from "../models/url.model";
 import { HttpException } from "../utils/errorHandler";
-import { createShortUrl } from "../utils/urlhandler";
+import { createShortUrl, urlValidator } from "../utils/urlhandler";
 
-const retryUrlGeneration = async (): Promise<string> => {
+export const retryUrlGeneration = async (): Promise<string> => {
   const shortURL = createShortUrl();
   const isExists = await findOneUrl({
     shortURL,
@@ -31,8 +31,11 @@ export const create = async ({
   timeout,
 }: Partial<IUrl>) => {
   try {
+    const { isValid, newURL } = checkValidURL(originalURL as string);
+    if (!isValid) throw new HttpException("Invalid URL", 400);
+    const isCustom = !!customURL;
     let shortURL = customURL;
-    if (shortURL) {
+    if (isCustom) {
       const isExists = await findOneUrl({
         shortURL,
       });
@@ -44,15 +47,31 @@ export const create = async ({
     }
 
     const url = new Url({
-      originalURL,
+      originalURL: newURL,
       shortURL,
+      isCustom,
       ...(userId && { userId }),
       ...(timeout && { timeout }),
     });
-    logger.info(`Created: ${url}`);
     await url.save();
+    logger.info(`Created: ${url}`);
     return url.shortURL;
   } catch (error) {
     throw new HttpException(error.message, error?.status);
   }
+};
+
+export const checkValidURL = (url: string) => {
+  let tempUrl = url;
+  const isValid = urlValidator(tempUrl);
+
+  logger.info(isValid);
+  // update the URL with http/https to check again for validity
+  if (!url.startsWith("http://") && !url.startsWith("https://")) {
+    tempUrl = `http://${tempUrl}`;
+  }
+  return {
+    newURL: tempUrl,
+    isValid: urlValidator(tempUrl),
+  };
 };
