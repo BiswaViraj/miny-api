@@ -4,7 +4,12 @@ import { Url } from "../models";
 import { IUrl } from "../models/url.model";
 import { HttpException } from "../utils/errorHandler";
 import { createShortUrl, urlValidator } from "../utils/urlhandler";
-
+export interface ICreateURL {
+  originalURL: string;
+  customURL?: string;
+  userId?: string;
+  timeout?: Date | string;
+}
 export const retryUrlGeneration = async (): Promise<string> => {
   const shortURL = createShortUrl();
   const isExists = await findOneUrl({
@@ -29,12 +34,12 @@ export const create = async ({
   customURL,
   userId,
   timeout,
-}: Partial<IUrl>) => {
+}: ICreateURL) => {
   try {
     const { isValid, newURL } = checkValidURL(originalURL as string);
     if (!isValid) throw new HttpException("Invalid URL", 400);
     const isCustom = !!customURL;
-    let shortURL = customURL;
+    let shortURL = customURL?.trim();
     if (isCustom) {
       const isExists = await findOneUrl({
         shortURL,
@@ -47,7 +52,7 @@ export const create = async ({
     }
 
     const url = new Url({
-      originalURL: newURL,
+      originalURL: newURL.trim(),
       shortURL,
       isCustom,
       ...(userId && { userId }),

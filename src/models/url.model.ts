@@ -1,15 +1,16 @@
-import { Document, model, Schema } from "mongoose";
+import { model, Schema, Types } from "mongoose";
 
-export interface IUrl extends Document {
+export interface IUrl {
   originalURL: string;
   customURL?: string;
   shortURL: string;
-  userId: string | null;
+  userId: Types.ObjectId;
   active: boolean;
   timeout: Date;
+  isCustom: boolean;
 }
 
-const urlSchema = new Schema(
+const urlSchema = new Schema<IUrl>(
   {
     originalURL: {
       type: String,

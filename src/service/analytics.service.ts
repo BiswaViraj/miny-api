@@ -1,18 +1,22 @@
+import { FilterQuery } from "mongoose";
 import logger from "../config/logger";
-import Analytics from "../models/analytics.model";
-import { IUrl } from "../models/url.model";
+import Analytics, { IAnalytics } from "../models/analytics.model";
 import { getClientInfo } from "../utils/clientInfo";
 
-export const addVisit = async (
-  urlId: IUrl["_id"],
-  userAgent: string | undefined
-) => {
+export interface IAddVisit {
+  urlId: string;
+  userAgent?: string | undefined;
+  userId?: string;
+}
+export const addVisit = async ({ urlId, userAgent, userId }: IAddVisit) => {
   const payload = {
     urlId,
     browser: "N/A",
     deviceType: "N/A",
     os: "N/A",
+    ...(userId && { userId }),
   };
+
   if (userAgent) {
     const { client, device, os: c_os } = getClientInfo(userAgent);
     payload.browser = (client?.type === "browser" && client?.name) || "N/A";
@@ -27,4 +31,19 @@ export const addVisit = async (
   await analytic.save();
   logger.info(`Analytics: ${JSON.stringify(payload)}`);
   return analytic;
+};
+
+export const getVisitsByUser = async (
+  userId: string,
+  options?: FilterQuery<IAnalytics>
+) => {
+  try {
+    const analytics = await Analytics.find({
+      userId,
+      ...(options && { options }),
+    });
+    return analytics;
+  } catch (error) {
+    throw new Error(error);
+  }
 };

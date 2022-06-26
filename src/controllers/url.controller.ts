@@ -1,14 +1,15 @@
-import { NextFunction, Request, Response } from "express";
+import { NextFunction, Response } from "express";
 import { create } from "../service/url.service";
+import { IRequest } from "../types/userRequest";
 
 export const createUrl = async (
-  req: Request,
+  req: IRequest,
   res: Response,
   next: NextFunction
 ) => {
   try {
-    const { originalURL, customURL, timeout, userId } = req.body;
-
+    const { originalURL, customURL, timeout } = req.body;
+    const userId = req?.userId;
     const shortURL = await create({
       originalURL,
       customURL,

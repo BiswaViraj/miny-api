@@ -1,4 +1,4 @@
-import { Document, model, Schema } from "mongoose";
+import { model, Schema } from "mongoose";
 
 /**
  * Interface to model the User Schema for TypeScript.
@@ -7,14 +7,14 @@ import { Document, model, Schema } from "mongoose";
  * @param firstName:string
  * @param lastName:string
  */
-export interface IUser extends Document {
+export interface IUser {
   email: string;
   password: string;
   firstName: string;
   lastName: string;
 }
 
-const userSchema: Schema = new Schema(
+const userSchema = new Schema<IUser>(
   {
     email: {
       type: String,
