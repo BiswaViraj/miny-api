@@ -1,5 +1,6 @@
 import express, { Express } from "express";
 import "dotenv/config";
+import compression from "compression";
 import connectDB from "./config/database";
 import errorHandler from "./utils/errorHandler";
 import { PORT } from "./config/constant";
@@ -15,6 +16,7 @@ const app: Express = express();
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(compression());
 
 // Setting CORS headers and accepted HTTP Methods, Headers
 app.use((req, res, next) => {
