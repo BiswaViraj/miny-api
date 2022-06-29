@@ -9,6 +9,7 @@ export const redirectURL = async (
 ) => {
   try {
     const url = req.params.shortURL;
+
     const urlFound = await checkAndRedirectURL(url);
     const userId = urlFound?.userId?.toString();
     const userAgent = req.headers["user-agent"];
@@ -17,7 +18,7 @@ export const redirectURL = async (
       userAgent,
       ...(userId && { userId }),
     });
-    res.status(301).redirect(urlFound.originalURL);
+    res.send({ url: urlFound.originalURL });
   } catch (error) {
     next(error);
   }
