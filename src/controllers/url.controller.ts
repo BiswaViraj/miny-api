@@ -1,6 +1,7 @@
 import { NextFunction, Response } from "express";
-import { create } from "../service/url.service";
+import { create, getUserUrlById } from "../service/url.service";
 import { IRequest } from "../types/userRequest";
+import { HttpException } from "../utils/errorHandler";
 
 export const createUrl = async (
   req: IRequest,
@@ -18,6 +19,25 @@ export const createUrl = async (
     });
     res.json({
       shortURL,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getUserUrl = async (
+  req: IRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const userId = req?.userId;
+
+    if (!userId) throw new HttpException("Not Authenticated", 403);
+
+    const urls = await getUserUrlById(userId);
+    res.status(200).json({
+      urls,
     });
   } catch (error) {
     next(error);

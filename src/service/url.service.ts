@@ -80,3 +80,11 @@ export const checkValidURL = (url: string) => {
     isValid: urlValidator(tempUrl),
   };
 };
+
+export const getUserUrlById = async (userId: string) => {
+  const urls = Url.find({
+    userId,
+  });
+
+  return urls;
+};
